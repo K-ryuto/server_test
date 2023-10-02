@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "apache": "^0.1.0",
+    "babel-preset-react": "^6.24.1",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "ngrok": "^5.0.0-beta.2",
+    "nodemon": "^3.0.1",
+    "sh": "^0.0.3",
+    "websocket": "^1.0.34",
+    "ws": "^8.13.0"
+  },
+  "name": "kojor",
+  "version": "1.0.0",
+  "description": "handson",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./server.js",
+    "setup1": "ssh -R zikkou:80:localhost:5000 k_r_@tcpexposer.com -i yourkey",
+    "setup2": "ssh -R koureisai:80:localhost:5555 k_r_@tcpexposer.com -i yourkey ",
+    "setup3": "ssh -R adm-kou:80:localhost:8000 k_r_@tcpexposer.com -i yourkey",
+    "add_script": "npm run start & npm run setup"
+  },
+  "author": "",
+  "license": "ISC"
+}
