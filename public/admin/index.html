@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+        <title>来場者メニュー</title>
+        <style>
+        </style>
+    </head>
+    <body>
+        <label>
+            <h3>管理用ページ</h3>
+        </label>
+        <span>user:</span>
+        <span id="users"></span>
+    </body>
+    <script>
+        const URL = `wss://${window.location.hostname}/`
+        const PROTOCOL = 'ws-sample'
+        
+        // ------------------------------
+        // WebSocket イベント
+        // ------------------------------
+        
+        
+        var websocket
+        function initWebSocket() {
+            console.log('Trying to open a WebSocket connection...');
+            websocket = new WebSocket(URL,PROTOCOL);
+            websocket.onopen    = onOpen;
+            websocket.onclose   = onClose;
+            websocket.onmessage = onMessage; // <-- add this line
+        }
+        function onOpen(event) {
+            console.log('Connection opened');
+        }
+        function onClose(event) {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 200);
+        }
+        function onMessage(event) {
+            console.log(event.data)
+            document.getElementById("users").innerHTML = event.data
+        }
+        function onLoad(event) {
+            initWebSocket();
+        }
+        initWebSocket()
+    </script>
+</html>

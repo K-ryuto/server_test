@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+        <title>予約システム</title>
+        <style>
+            h3{
+                margin: 0%;
+            }
+            label {
+                display: flex;
+            }
+        </style>
+    </head>
+    <body>
+        <label>
+            <h3>2-2の予約を行うことができます!</h3>
+            <a href="javascript:ret()">戻る</a>
+        </label>
+        <input type="text" id="pass" placeholder="ユーザー名を入力して予約">
+        <button id="pas">送信</button>
+        <br>
+        <span id="status"></span>
+    </body>
+    <script>
+        const URL = `wss://${window.location.hostname}/`
+        const PROTOCOL = 'ws-sample'
+        
+        var websocket
+        function initWebSocket() {
+            console.log('Trying to open a WebSocket connection...');
+            websocket = new WebSocket(URL,PROTOCOL);
+            websocket.onopen    = onOpen;
+            websocket.onclose   = onClose;
+            websocket.onmessage = onMessage;
+        }
+        function onOpen(event) {
+            console.log('Connection opened');
+        }
+        function onClose(event) {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 200);
+        }
+        function onMessage(event) {
+            console.log(event)
+            if(event.data == "true"){
+                document.getElementById("status").innerHTML = "登録が完了しました。idは忘れないようにしてください。5秒後に元のページに戻ります"
+                setTimeout(ret(), 3000)
+            }else if(event.data == "false"){
+                document.getElementById("status").innerHTML = "そのidは既に使われています"
+            }
+        }
+        function onLoad(event) {
+            initWebSocket();
+        }
+        // ------------------------------
+        // WebSocket メソッド
+        // ------------------------------
+        const sendMessage = (message) => {
+            websocket.send(message)
+        }
+        document.getElementById("pas").addEventListener('click', (event) => {
+            const users = {
+                users: [
+                    {
+                    "id": document.getElementById("pass").value,
+                    "type": "up"
+                    },
+                ]
+            }
+
+            // JSONへ変換
+            let jsonData = JSON.stringify(users);
+            sendMessage(jsonData)
+        })
+        initWebSocket();
+        function ret(){
+            location=`/?id=${document.getElementById("pass").value}`
+        }
+        var id = 0
+        const url = window.location.search;
+
+        // パラメータから「username」を取得
+        if(url.substr(1,3) == "id="){
+            id = url.substr(4)
+            document.getElementById("pass").value = id
+        }
+    </script>
+</html>

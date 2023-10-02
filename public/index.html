@@ -1,0 +1,178 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+        <title>来場者メニュー</title>
+        <style>
+            .h3{
+                width: 100%;
+                text-align: center;
+                background-color: aqua;
+                margin: 0;
+                font-size: 30px;
+            }
+            h1{
+                width: 100%;
+                text-align: center;
+                /* background-color: aqua; */
+                margin: 0;
+                font-size: 30px;
+            }
+            .label{
+                margin: 0;
+                display: flex;
+                justify-content: space-around;
+            }
+            .top{
+                background-color: aqua;
+                display: flex;
+                justify-content: space-between;
+            }
+            body{
+                margin: 0;
+            }
+            .login{
+
+            }
+            .body{
+                display: flex;
+                justify-content: space-between;
+            }
+            p{
+                margin: 0;
+            }
+            datalist{
+                font: 16px "Open Sans",
+                Calibri,
+                sans-serif;
+                width: 620px;
+            }
+            details > summary{
+                padding: 2px 6px;
+                width: 15em;
+                border: none;
+                cursor: pointer;
+                list-style: none;
+            }
+        </style>
+    </head>
+    <body>
+        <label class="top">
+            <h1>2-2クラス企画</h1>
+            <h1>予約</h1>
+            <details>
+                <summary><h1>一覧</h1></summary>
+                <li>
+                    <button>1</button>
+                    <button>2</button>
+                    <button>3</button>
+                </li>
+            </details>
+            <h1>ルール</h1>
+        </label>
+        <label class="body">
+            <label>
+                <P>現在の待ち時間:</P>
+                <p id="time_w"></p>
+            </label>
+            <label>
+                <input type="text" id="login-t">
+                <br>
+                <label class="body">
+                    <div></div>
+                    <input type="button" id="login-b" value="ログイン"/>
+                </label>
+                <p id="login_mess"></p>
+            </label>
+        </label>
+        <div id="img-qr"></div>
+    </body>
+    <script>
+        var id = 0
+        const url = window.location.search;
+
+        // パラメータから「username」を取得
+        if(url.substr(1,3) == "id="){
+            id = url.substr(4)
+        }
+        function send_c(uri){
+            console.log(uri)
+            location = `/contract?id=${id}`
+        }
+        function send_q(uri){
+            console.log(uri)
+            location = `/qr?id=${id}`
+        }
+        const URL = `wss://${window.location.hostname}/`
+        const PROTOCOL = 'ws-sample'
+        
+        // ------------------------------
+        // WebSocket イベント
+        // ------------------------------
+        var websocket
+        function initWebSocket() {
+            console.log('Trying to open a WebSocket connection...');
+            websocket = new WebSocket(URL,PROTOCOL);
+            websocket.onopen    = onOpen;
+            websocket.onclose   = onClose;
+            websocket.onmessage = onMessage; // <-- add this line
+        }
+        function onOpen(event) {
+            console.log('Connection opened');
+        }
+        function onClose(event) {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 200);
+        }
+        function onMessage(event) {
+            console.log(event.data)
+            if(event.data == "false"){
+                    let qrtext = $("#login-t").val();
+                    let utf8qrtext = unescape(encodeURIComponent(qrtext));
+                    let size = 160
+                    $("#img-qr").html("");
+                    $("#img-qr").qrcode({width:size,height:size,text:utf8qrtext});
+                }else if(event.data == "true"){
+                    $("#img-qr").html("idが登録されていません。<a href='javascript:ret()'>こちらのリンクから登録できます</a>。")
+                }
+        }
+        function onLoad(event) {
+            initWebSocket();
+        }
+        // ------------------------------
+        // WebSocket メソッド
+        // ------------------------------
+        const sendMessage = (message) => {
+            websocket.send(message)
+        }
+        document.getElementById("login-b").addEventListener('click', (event) => {
+            const users = {
+                users: [
+                    {
+                    "id": document.getElementById("login-t").value,
+                    "type": "in"
+                    }
+                ]
+            }
+
+            // JSONへ変換
+            let jsonData = JSON.stringify(users);
+            sendMessage(jsonData)
+        })
+        initWebSocket()
+        function ret(){
+            location=`/contract?id=${document.getElementById("login-t").value}`
+        }
+        var id = 0
+        const uri = window.location.search;
+
+        // パラメータから「username」を取得
+        if(uri.substr(1,3) == "id="){
+            id = uri.substr(4)
+            document.getElementById("login-t").value = id
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+</html>

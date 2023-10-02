@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+        <title>実行者用メニュー</title>
+    </head>
+    <body>
+        <a href="/qr"><h1>qrコード</h1></a>
+        <!-- <a href="/qiita"><h1>b</h1></a> -->
+        <span>id=</span>
+        <span id="id"></span>
+    </body>
+    <script>
+        const URL = `wss://${window.location.hostname}/`
+        const PROTOCOL = 'ws-sample'
+        
+        const socket = new WebSocket(URL,PROTOCOL)
+                
+        var acc = {acc:"",score:0}
+        var kind = {poker:acc,e_card:acc,}
+        var time = {reqest:0,enter:0,exit:0,used:kind,wait:0}
+        var player = {name:"",score:kind,auth:1,time:time}
+        var client = {count:{enter:0,request:{req_time:0},score:{avg_score:0,total_score:0}}}
+        // ------------------------------
+        // WebSocket イベント
+        // ------------------------------
+        
+        // WebSocket が開通したら発火する
+        // socket.onopen = () => {} でも可
+        socket.addEventListener('open', (event) => {
+            sendMessage(id)
+        })
+        
+        // WebSocketサーバ からメッセージを受け取ったら発火する
+        // socket.onmessage = () => {} でも可
+        socket.addEventListener('message', ({ data }) => {
+            player = JSON.parse(data)
+            console.log(player)
+        })
+        
+        // WebSocketサーバ からエラーメッセージを受け取ったら発火する
+        // socket.onerror = () => {} でも可
+        socket.addEventListener('error', (event) => {
+        console.log('error')
+        })
+        
+        // WebSocket がクローズしたら発火する
+        // socket.onclose = () => {} でも可
+        socket.addEventListener('close', (event) => {
+        console.log('close')
+        })
+        
+        // ------------------------------
+        // WebSocket メソッド
+        // ------------------------------
+        const sendMessage = (message) => {
+        socket.send(message)
+        }
+
+        // URLを取得
+        const url = window.location.search;
+
+        // パラメータから「username」を取得
+        const id = url.substr(4)
+        document.getElementById("id").innerHTML = id
+    </script>
+</html>
